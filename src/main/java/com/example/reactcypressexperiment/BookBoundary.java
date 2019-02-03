@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/books")
 public class BookBoundary {
@@ -13,6 +15,10 @@ public class BookBoundary {
     private final BookStore bookStore;
 
     @Autowired public BookBoundary(BookStore bookStore) { this.bookStore = bookStore; }
+
+    @GetMapping() public List<Book> getAllBook() {
+        return bookStore.getAll();
+    }
 
     @GetMapping("/{id}") public Book getBook(@PathVariable int id) {
         return bookStore.get(id);

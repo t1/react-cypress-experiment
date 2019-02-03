@@ -9,13 +9,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class BookBoundaryTest {
+    private static final String THE_HOBBIT = "{" +
+        "\"author\":\"J.R.R. Tolkien\"," +
+        "\"title\":\"The Hobbit\"" +
+        "}";
+    private static final String THE_LORD_OF_THE_RINGS = "{" +
+        "\"author\":\"J.R.R. Tolkien\"," +
+        "\"title\":\"The Lord Of The Rings\"" +
+        "}";
+
     private final MockMvc mvc = MockMvcBuilders.standaloneSetup(new BookBoundary(new BookStore())).build();
 
-    @Test void shouldFailToGetBookWithoutId() throws Exception {
-        mvc.perform(get("/books/"))
-
-            .andExpect(status().isNotFound());
-    }
 
     @Test void shouldFailToGetBookWithInvalidId() throws Exception {
         mvc.perform(get("/books/x"))
@@ -42,9 +46,13 @@ class BookBoundaryTest {
         mvc.perform(get("/books/1"))
 
             .andExpect(status().isOk())
-            .andExpect(content().json("{" +
-                "\"author\":\"J.R.R. Tolkien\"," +
-                "\"title\":\"The Hobbit\"" +
-                "}"));
+            .andExpect(content().json(THE_HOBBIT));
+    }
+
+    @Test void shouldGetAllBooks() throws Exception {
+        mvc.perform(get("/books"))
+
+            .andExpect(status().isOk())
+            .andExpect(content().json("[" + THE_HOBBIT + "," + THE_LORD_OF_THE_RINGS + "]"));
     }
 }
