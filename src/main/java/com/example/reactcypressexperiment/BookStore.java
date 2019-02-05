@@ -15,9 +15,9 @@ public class BookStore {
     public Book get(int id) {
         switch (id) {
             case 1:
-                return Book.by("J.R.R. Tolkien").setTitle("The Hobbit");
+                return Book.builder().author("J.R.R. Tolkien").title("The Hobbit").build();
             case 2:
-                return Book.by("J.R.R. Tolkien").setTitle("The Lord Of The Rings");
+                return Book.builder().author("J.R.R. Tolkien").title("The Lord Of The Rings").build();
             default:
                 throw new BookNotFoundException(id);
         }
