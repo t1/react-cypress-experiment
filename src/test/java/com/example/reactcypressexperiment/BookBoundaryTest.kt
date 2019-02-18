@@ -1,6 +1,5 @@
 package com.example.reactcypressexperiment
 
-import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
@@ -9,7 +8,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders
 
 internal class BookBoundaryTest {
 
-    private val mvc = MockMvcBuilders.standaloneSetup(BookBoundary(BookStore(), BookMapperImpl())).build()
+    private val mvc = MockMvcBuilders.standaloneSetup(BookBoundary(BookStore())).build()
 
     @Test fun shouldFailToGetBookWithInvalidId() {
         mvc.perform(get("/books/x"))
@@ -17,8 +16,14 @@ internal class BookBoundaryTest {
             .andExpect(status().isBadRequest)
     }
 
-    @Test fun shouldFailToGetUnknownBook() {
+    @Test fun shouldFailToGetBookWithNegativeId() {
         mvc.perform(get("/books/-1"))
+
+            .andExpect(status().isBadRequest)
+    }
+
+    @Test fun shouldFailToGetUnknownBook() {
+        mvc.perform(get("/books/9999999"))
 
             .andExpect(status().isNotFound) // Can't check the problem body in MockMvc. It's not rfc-7807 anyway.
         // .andExpect(content().json("" +
@@ -42,21 +47,23 @@ internal class BookBoundaryTest {
     }
 
     @Test fun shouldGetAllBooks() {
-        val result = mvc.perform(get("/books"))
+        mvc.perform(get("/books"))
 
-        result.andExpect(status().isOk)
+            .andExpect(status().isOk)
             .andExpect(content().json("[" +
                 "{" +
+                "\"id\":1," +
                 "\"author\":\"J.R.R. Tolkien\"," +
                 "\"title\":\"The Hobbit\"" +
                 "},{" +
+                "\"id\":2," +
                 "\"author\":\"J.R.R. Tolkien\"," +
                 "\"title\":\"The Lord Of The Rings\"" +
                 "},{" +
+                "\"id\":3," +
                 "\"author\":\"Steven King\"," +
                 "\"title\":\"It\"" +
                 "}" +
                 "]"))
-        assertThat(result.andReturn().response.contentAsString).doesNotContain("recommended")
     }
 }
