@@ -6,11 +6,14 @@ import java.lang.Thread.sleep
 import javax.servlet.FilterChain
 import javax.servlet.ServletRequest
 import javax.servlet.ServletResponse
+import javax.servlet.http.HttpServletRequest
 
 @Component
 class SleepFilter : GenericFilterBean() {
+
     override fun doFilter(req: ServletRequest, res: ServletResponse, chain: FilterChain) {
-        sleep(1000)
+        val request = req as HttpServletRequest
+        if (request.queryString?.contains("sleep") == true) sleep(1000)
         chain.doFilter(req, res)
     }
 }
