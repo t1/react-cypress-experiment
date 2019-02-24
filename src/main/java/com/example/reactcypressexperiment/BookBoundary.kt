@@ -1,5 +1,6 @@
 package com.example.reactcypressexperiment
 
+import com.example.reactcypressexperiment.Book.Companion.NO_ID
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.GetMapping
@@ -26,9 +27,19 @@ class BookBoundary(
         return store[id]
     }
 
-    @PostMapping fun postOneBooks(@Valid @RequestBody book: Book): ResponseEntity<Book> {
-        store.add(book)
-        return ResponseEntity.created(URI.create("/books/" + book.id)).body(book); }
+    @PostMapping fun postBook(@Valid @RequestBody book: Book): ResponseEntity<Book> {
+        val created = store.add(book)
+        val response = when {
+            created -> ResponseEntity.created(URI.create("/books/" + book.id))
+            else -> ResponseEntity.ok()
+        }
+        return response.body(book)
+    }
+
+    @PostMapping("/{id}") fun postExitingBook(@PathVariable id: Int, @Valid @RequestBody book: Book): ResponseEntity<Book> {
+        if (book.id != NO_ID && book.id != id) throw BookIdMismatchException(id, book)
+        return postBook(book)
+    }
 
     @PutMapping fun putAllBooks(@Valid @RequestBody books: List<Book>) {
         store.all = books.toMutableList()
